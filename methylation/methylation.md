@@ -36,7 +36,7 @@ Two files are output: a report file and ‘*.trimmed.fq’ file.
 
   5. Convert fastq files to fasta format files, for example:
 ‘fastq_to_fasta -i NZM40_R1R2.assembled_trimmed.fq -o NZM40_R1R2.fasta’
-# option -i specifies the input file and option -o names the output file
+Note:  option -i specifies the input file and option -o names the output file
 
   6. Align read files (bisulfite-converted) with reference sequence using BiQ_Analyzer, for example:
 java -jar BiQ_Analyzer.jar -nogui -rseq EBF3_seq.txt -bseq NZM40_R1R2.fasta -outdir ./NZM40 -sortcgmeth
