@@ -29,7 +29,7 @@ Subset of sequencing data from (Kindly provided by) Bicknel's lab (University of
 Amplicon sequencing of ORC1 gene:
 
   * Forward PCR primer: TTACATGTTTTGTCCTCATTTGC
-  * Reverse PCR primer: GCAAGCATCCCATCTCAATATC
+  * Reverse PCR primer: GCAAGCATCCCATCTCAATATC (revcomp: GATATTGAGATGGGATGCTTGC)
   * sgRNA: GGGCGGGAGCCTCATCAAGAGG
 
 
@@ -102,7 +102,7 @@ mkdir demux
 ```
 
 ```
-cutadapt -e 0 --no-indels -g file:barcode_fwd.fa -G file:barcode_rev.fa -o demux/{name1}-{name2}_R1.fastq.gz -p demux/{name1}-{name2}_R2.fastq.gz trimmed/Injected_trimmed_R1.fastq trimmed/Injected_trimmed_R2.fastq
+cutadapt -e 0 --no-indels -g file:/data/barcode_fwd.fa -G file:/data/barcode_rev.fa -o demux/{name1}-{name2}_R1.fastq.gz -p demux/{name1}-{name2}_R2.fastq.gz trimmed/Injected_trimmed_R1.fastq trimmed/Injected_trimmed_R2.fastq
 
 ```
 Note: several files are now available.
@@ -185,6 +185,20 @@ After launching this command, you should see a window appearing on your local sc
   * Click on tab genomes then load Genome from file
   * select the reference fasta file
   * Click on tab Files then Load from File ...
+
+### Exploration of "quick" estimation
+
+use samtools mpileup to stack the alignemnt
+
+```
+samtools mpileup -C50 -gf ../ref.fa  injected_aln_sorted.bam > injected_mpileup.vcf.gz
+```
+
+```
+bcftools view -cgNv injected_mpileup.vcf.gz > injected_editions.vcf
+```
+
+
 
 
 
