@@ -18,12 +18,12 @@ DNA was bisulfite-treated and then PCR amplified with EBF3-promoter specific pri
 After MiSeq sequencing, the sequencer will de-multiplex reads based on the index sequences, i.e. separate reads into samples, and output compressed sequence reads as ‘.fastq.gz’ files. As we have done paired-end sequencing, we have 2 ‘.fastq.gz’ files per sample. i.e. 6 files in total. 
 
   1. Check quality of sequence files with FastQC, for example:
-‘fastqc NZM40_R1.fastq.gz’
+__‘fastqc NZM40_R1.fastq.gz’__
 You should view the ‘.html’ file, particularly the Per base sequence quality plot
 
   2. Use ‘PEAR’ joiner to join R1 and R2 ‘.fastq.gz’ files.
 PEAR does not need files to be de-compressed. PEAR is an intuitive joiner – meaning that it will find overlapping regions and call bases based on quality score, so that good bases will be favoured over bad and quality should be better in the overlap region. Example:
-‘pear -f  NZM40_R1.fastq.gz -r NZM40_R2.fastq.gz -o NZM40_R1R2’
+__‘pear -f  NZM40_R1.fastq.gz -r NZM40_R2.fastq.gz -o NZM40_R1R2’__
 Pear will output reads into several files, but we are only interested in the ‘.assembled.fastq’ file
 
   3. Confirm/check quality of merged reads with FastQC, for example:
@@ -31,15 +31,15 @@ Pear will output reads into several files, but we are only interested in the ‘
 You can see that PEAR has improved quality of sequence over the join region by viewing the ‘.html’ file.
 
   4. Remove Illumina adaptor sequences and bad quality reads with ‘trim_galore’:
-‘trim_galore NZM40_R1R2.assembled.fastq’
+__‘trim_galore NZM40_R1R2.assembled.fastq’__
 Two files are output: a report file and ‘*.trimmed.fq’ file.
 
   5. Convert fastq files to fasta format files, for example:
-‘fastq_to_fasta -i NZM40_R1R2.assembled_trimmed.fq -o NZM40_R1R2.fasta’
+__‘fastq_to_fasta -i NZM40_R1R2.assembled_trimmed.fq -o NZM40_R1R2.fasta’__
 Note:  option -i specifies the input file and option -o names the output file
 
   6. Align read files (bisulfite-converted) with reference sequence using BiQ_Analyzer, for example:
-java -jar /usr/local/bin/BiQ_Analyzer.jar -nogui -rseq /data/methylation/EBF3_seq.txt -bseq /data/methylation/NZM40_R1R2.fasta -outdir ./NZM40 -sortcgmeth
+__java -jar /usr/local/bin/BiQ_Analyzer.jar -nogui -rseq /data/methylation/EBF3_seq.txt -bseq /data/methylation/NZM40_R1R2.fasta -outdir ./NZM40 -sortcgmeth__
 
 Note: BiQ_Analyzer is a JAVA program, so we execute within a JAVA environment; -nogui option runs command non-graphically; -rseq specifies the file that contains the reference sequence; -bseq specifies the read file to be analysed; -outdir specifies directory to which files will be written; -sortcgmeth will sort reads from highest methylation to lowest
 
