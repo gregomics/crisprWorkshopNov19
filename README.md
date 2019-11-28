@@ -32,7 +32,8 @@ Amplicon sequencing of ORC1 gene:
   * Reverse PCR primer: GCAAGCATCCCATCTCAATATC
   * sgRNA: GGGCGGGAGCCTCATCAAGAGG
 
-Fastq sequencing data can be found: 
+
+Fastq sequencing data can be found /data/ : 
 
   * Injected_R1.fastq.gz
   * Injected_R2.fastq.gz
@@ -53,9 +54,28 @@ mkdir qc
 run quality control:
 
 ```
-fastqc -o qc/ Injected_R1.fastq.gz
+fastqc -o qc/ /data/Injected_R1.fastq.gz
 
 ```
+
+### Trimming bad quality or adaptor content
+
+To trim adaptor sequences as well as bad quality data, we will use cutadapt.
+
+  * -q quality score (Phred)
+  * -B -b fasta file containing adaptors we want to remove
+  * -o R1 trimmed file
+  * -p R2 trimmed file (paired)
+
+```
+mkdir trimmed
+
+```
+
+```
+cutadapt -B file:/data/adapt.fa -q 30 -b file:/data/adapt.fa -O 5 --discard -o trimmed/Injected_trimmed_R1.fastq -p trimmed/Injected_trimmed_R2.fastq /data/Injected_R1.fastq.gz /data/Injected_R2.fastq.gz
+```
+
 
 ### Demultiplexing
 
@@ -74,9 +94,97 @@ TTACATGTTTTGTCCTCATTTGC
 GCAAGCATCCCATCTCAATATC
 ```
 
+First we need to create a directory where the demultiplexed data will be stored:
 
 ```
-cutadapt -e 0.15 --no-indels -g file:barcode_fwd.fa -G file:barcode_rev.fa -o {name1}-{name2}_R1.fastq.gz -p {name1}-{name2}_R2.fastq.gz Injected_R1.fastq.gz Injected_R2.fastq.gz
+mkdir demux
 
 ```
+
+```
+cutadapt -e 0 --no-indels -g file:barcode_fwd.fa -G file:barcode_rev.fa -o demux/{name1}-{name2}_R1.fastq.gz -p demux/{name1}-{name2}_R2.fastq.gz trimmed/Injected_trimmed_R1.fastq trimmed/Injected_trimmed_R2.fastq
+
+```
+Note: several files are now available.
+
+Same demultiplexing for the UnInjected sample.
+
+At the end of this step, the sequences are then cleaned and demultiplexed.
+
+### Merging Paired end reads
+
+R1 (forward) and R2 (reverse) are sequences coming from the same DNA fragment.
+If they overlap they can be merged and recreate a full length amplimer sequence.
+To do merge the paired ends, there is a variety of tools. 
+
+First, let's create a directory to store the merged data:
+
+```
+mkdir mergedPE
+```
+Now let's merge the paired end to recreate the amplimer.
+
+```
+flash -t 1 -O demux/fwd_BC1-rev_BC1_R1.fastq.gz demux/fwd_BC1-rev_BC1_R2.fastq.gz -o merged -d mergedPE
+```
+Flash has merged the paired end reads and create the following file: merged.extendedFrags.fastq
+
+### Alignment on Target
+
+To align the merged reads on the target, the target must first be indexed.
+To avod permission issues, I will need to copy it in a new directory.
+
+```
+mkdir ref
+cp /data/ref.fa ref/
+```
+Index the reference:
+
+```
+bwa index ref/ref.fa
+
+```
+Then we need to create a directory where we store the alignment.
+
+```
+mkdir aln
+```
+
+```
+bwa mem -t 1 ref/ref.fa mergedPE/merged.extendedFrags.fastq | samtools view -bS - > aln/injected_aln.bam
+
+```
+
+### Visualisation of the alignment:
+
+Prior to load the alignment, the bam file must be sorted:
+
+```
+cd aln
+```
+
+```
+samtools sort injected_aln.bam injected_aln_sorted
+```
+it will generate the sorted file: injected_aln_sorted.bam
+
+This file needs to be indexed as well :
+
+```
+samtools index injected_aln_sorted.bam
+
+```
+Now the alignment is ready for visualisation using IGV.
+
+```
+igv
+```
+
+After launching this command, you should see a window appearing on your local screen.
+
+  * Click on tab genomes then load Genome from file
+  * select the reference fasta file
+  * Click on tab Files then Load from File ...
+
+
 
