@@ -39,7 +39,7 @@ Two files are output: a report file and ‘*.trimmed.fq’ file.
 Note:  option -i specifies the input file and option -o names the output file
 
   6. Align read files (bisulfite-converted) with reference sequence using BiQ_Analyzer, for example:
-java -jar BiQ_Analyzer.jar -nogui -rseq EBF3_seq.txt -bseq NZM40_R1R2.fasta -outdir ./NZM40 -sortcgmeth
+java -jar /usr/local/bin/BiQ_Analyzer.jar -nogui -rseq /data/methylation/EBF3_seq.txt -bseq /data/methylation/NZM40_R1R2.fasta -outdir ./NZM40 -sortcgmeth
 
 Note: BiQ_Analyzer is a JAVA program, so we execute within a JAVA environment; -nogui option runs command non-graphically; -rseq specifies the file that contains the reference sequence; -bseq specifies the read file to be analysed; -outdir specifies directory to which files will be written; -sortcgmeth will sort reads from highest methylation to lowest
 
